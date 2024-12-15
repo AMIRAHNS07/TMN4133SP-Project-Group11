@@ -56,3 +56,4 @@ void keylogger(const char *logfile) {
     fclose(log);
     close(fd);
 }
+
