@@ -27,7 +27,7 @@ void delete_directory(const char *path)
 
    if(rmdir(path) == 0)
    {
-      print("Directory deleted successfully: %s\n", path);
+      printf("Directory deleted successfully: %s\n", path);
    }
    else
    {
