@@ -6,11 +6,18 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <dirent.h>
 
 void file_operations_menu();
 void directory_operations_menu();
 void keylogger_operations_menu(const char *logfile);
 void keylogger(const char *logfile);
+
+// Function declarations for directory operations
+void create_directory(const char *path);
+void delete_directory(const char *path);
+void print_current_directory();
+void list_files_in_directory(const char *path);
 
 int main(int argc, char *argv[]) 
 {
@@ -131,27 +138,109 @@ void directory_operations_menu()
 
         switch (choice) 
         {
-            case 1: 
-                printf("Selected: Create Directory\n");
+            case 1:
+                {
+
+                char path[100]; 
+                printf("Enter the directory name/path: ");
+                scanf("%s", path);
+                create_directory(path);
+                }
                 break;
 
-            case 2: 
-                printf("Selected: Delete Directory\n");
+            case 2:
+                { 
+
+                char path[100];
+                printf("Enter the directory name/path to delete: ");
+                scanf("%s", path);
+                delete_directory(path);
+                }
                 break;
+
 
             case 3:
-                printf("Selected: Print Current Working Directory\n");
+                print_current_directory();
                 break;
 
             case 4:
-                printf("Selected: List Files in Directory\n");
+                {
+              
+                char path[100];
+                printf("Enter the directory path to list: ");
+                scanf("%s", path);
+                list_files_in_directory(path);
+                }
                 break;
 
             case 0:
                 return;
+
             default:
                 printf("Invalid choice! Please try again.\n");
         }
     }
 }
 
+// Function to create a directory
+void create_directory(const char *path)
+{
+   if (mkdir(path, 0777) == 0)
+   {
+      printf("Directory created succesfully: %s\n", path);
+   }
+   else
+   {
+      perror("Failed to create directory");
+   }
+
+ }
+
+// Function to delete a directory
+void delete_directory(const char *path)
+{
+   if (rmdir(path) == 0)
+   {
+      printf("Directory deleted successfully: %s\n", path);
+   }
+   else
+   {
+      perror("Failed to delete directory");
+   }
+
+ }
+
+//Function to print the current working directory
+void print_current_directory()
+{
+   char cwd[1024];
+   if (getcwd(cwd, sizeof(cwd)) != NULL)
+   {
+     printf("Current working directory: %s\n", cwd);
+   }
+   else
+   {
+     perror("Failed to get current directory");
+   }
+
+ }
+
+//Function to list files in a directory
+void list_files_in_directory(const char *path)
+{
+  DIR *dir = opendir(path);
+  struct dirent *entry;
+  if (dir == NULL)
+  {
+    perror("Failed to open directory");
+    return;
+  }
+
+  printf("Listing files in directory: %s\n", path);
+  while ((entry = readdir(dir)) !=NULL)
+  {
+   printf("%s\n", entry->d_name);
+  }
+  closedir(dir);
+
+ }
