@@ -29,6 +29,15 @@ int main(int argc, char *argv[])
         return 0;  // Exit immediately after starting the keylogger
     }
 
+     // Check if -m 2 3 is passed to list directory contents
+     if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 2 && atoi(argv[3]) == 3) {
+     const char *dir_path = argv[3];
+
+     list_files_in_directory(dir_path);
+     return 0;
+
+    }
+
     // Main menu if no command-line args are passed
     int choice;
     while (1) 
