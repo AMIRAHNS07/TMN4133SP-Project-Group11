@@ -6,20 +6,36 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <dirent.h>
+#include "directory.h"
 
 void file_operations_menu();
 void directory_operations_menu();
 void keylogger_operations_menu(const char *logfile);
 void keylogger(const char *logfile);
 
+// Function declarations for directory operations
+void create_directory(const char *path);
+void delete_directory(const char *path);
+void print_current_directory();
+void list_files_in_directory(const char *path);
+
 int main(int argc, char *argv[]) 
 {
-    // Check if -m 3 is passed with a log file (keylog.txt)
-    if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 3) {
-        const char *logfile = argv[3];  // Use the provided logfile
-        keylogger_operations_menu(logfile);  // Call the keylogger operation directly
-        return 0;  // Exit immediately after starting the keylogger
-    }
+
+     
+     if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 3) {
+        const char *logfile = argv[3];
+        keylogger_operations_menu(logfile);
+        return 0;
+      }
+
+      if (argc == 5 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 2 && atoi(argv[3]) ==3) {
+        const char *path = argv[4]; 
+        list_files_in_directory(path);
+        return 0;
+       }
+
 
     // Main menu if no command-line args are passed
     int choice;
@@ -56,6 +72,7 @@ int main(int argc, char *argv[])
         }
     }
 }
+  
 
 // Keylogger menu function
 void keylogger_operations_menu(const char *logfile) 
@@ -131,27 +148,49 @@ void directory_operations_menu()
 
         switch (choice) 
         {
-            case 1: 
-                printf("Selected: Create Directory\n");
+            case 1:
+                {
+
+                char path[100]; 
+                printf("Enter the directory name/path: ");
+                scanf("%s", path);
+                create_directory(path);
+                }
                 break;
 
-            case 2: 
-                printf("Selected: Delete Directory\n");
+            case 2:
+                { 
+
+                char path[100];
+                printf("Enter the directory name/path to delete: ");
+                scanf("%s", path);
+                delete_directory(path);
+                }
                 break;
+
 
             case 3:
-                printf("Selected: Print Current Working Directory\n");
+                print_current_directory();
                 break;
 
             case 4:
-                printf("Selected: List Files in Directory\n");
+                {
+              
+                char path[100];
+                printf("Enter the directory path to list: ");
+                scanf("%s", path);
+                list_files_in_directory(path);
+                }
                 break;
 
             case 0:
                 return;
+
             default:
                 printf("Invalid choice! Please try again.\n");
         }
+
     }
 }
+
 
