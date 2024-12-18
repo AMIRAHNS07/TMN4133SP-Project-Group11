@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <dirent.h>
+#include "directory.h" 
 
 //Function to create a directory
 void create_directory(const char *path)
