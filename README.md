@@ -30,8 +30,8 @@ This project is a System Programming assignment for the course TMN4133. The obje
 
 *How to Compile*
 (a) Clone the repository: 
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/AMIRAHNS07/TMN4133SP-Project-Group11.git
+cd TMN4133SP-Project-Group11
 
 (b) Compile the project using GCC:
 gcc -o supercommand supercommand.c directory.c file_operations.c keylogger.c
