@@ -37,6 +37,47 @@ int main(int argc, char *argv[])
         return 0;
        }
 
+     if (argc >= 4 && strcmp(argv[1], "-m") == 0 && atoi(argv[2]) == 1) {
+        int operation = atoi(argv[3]);
+        switch(operation) {
+            case 1: // Create file
+                if (argc == 5) {
+                    create_file(argv[4]);
+                    return 0;
+                }
+                break;
+            case 2: // Change permissions
+                if (argc == 6) {
+                    mode_t mode = strtol(argv[5], NULL, 8);
+                    change_file_permission(argv[4], mode);
+                    return 0;
+                }
+                break;
+            case 3: // Read file
+                if (argc == 5) {
+                    read_file(argv[4]);
+                    return 0;
+                }
+                break;
+            case 4: // Write to file
+                if (argc == 5) {
+                    write_file(argv[4]);
+                    return 0;
+                }
+                break;
+            case 5: // Delete file
+                if (argc == 5) {
+                    delete_file(argv[4]);
+                    return 0;
+                }
+                break;
+            default:
+                printf("Invalid file operation\n");
+                return 1;
+        }
+        printf("Invalid number of arguments for file operation\n");
+        return 1;
+    }
 
     // Main menu if no command-line args are passed
     int choice;
