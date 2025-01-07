@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include "directory.h"
+#include "file_operations.h"
 
 void file_operations_menu();
 void directory_operations_menu();
@@ -85,13 +86,15 @@ void keylogger_operations_menu(const char *logfile)
 }
 
 // File operations menu function
-void file_operations_menu() 
-{
+void file_operations_menu() {
     int choice;
-    while (1) 
-    {
+    char filepath[256];
+    char mode_str[5];
+    mode_t mode;
+
+    while (1) {
         printf("\n=== File Operations Menu ===\n");
-        printf("1. Create/ Open File\n");
+        printf("1. Create/Open File\n");
         printf("2. Change File Permission\n");
         printf("3. Read from File\n");
         printf("4. Write to File\n");
@@ -99,31 +102,50 @@ void file_operations_menu()
         printf("0. Back to Main Menu\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
+        getchar(); // Consume newline
 
-        switch (choice) 
-        {
-            case 1: 
-                printf("Selected: Create/Open File\n");
+        switch (choice) {
+            case 1:
+                printf("Enter filepath: ");
+                fgets(filepath, sizeof(filepath), stdin);
+                filepath[strcspn(filepath, "\n")] = 0; // Remove newline
+                create_file(filepath);
                 break;
 
             case 2:
-                printf("Selected: Change File Permission\n");
+                printf("Enter filepath: ");
+                fgets(filepath, sizeof(filepath), stdin);
+                filepath[strcspn(filepath, "\n")] = 0;
+                printf("Enter permissions in octal (e.g., 644): ");
+                fgets(mode_str, sizeof(mode_str), stdin);
+                mode = strtol(mode_str, NULL, 8);
+                change_file_permission(filepath, mode);
                 break;
 
             case 3:
-                printf("Selected: Read from File\n");
+                printf("Enter filepath: ");
+                fgets(filepath, sizeof(filepath), stdin);
+                filepath[strcspn(filepath, "\n")] = 0;
+                read_file(filepath);
                 break;
 
             case 4:
-                printf("Selected: Write to File\n");
+                printf("Enter filepath: ");
+                fgets(filepath, sizeof(filepath), stdin);
+                filepath[strcspn(filepath, "\n")] = 0;
+                write_file(filepath);
                 break;
 
             case 5:
-                printf("Selected: Delete File\n");
+                printf("Enter filepath: ");
+                fgets(filepath, sizeof(filepath), stdin);
+                filepath[strcspn(filepath, "\n")] = 0;
+                delete_file(filepath);
                 break;
 
             case 0:
                 return;
+
             default:
                 printf("Invalid choice! Please try again.\n");
         }
